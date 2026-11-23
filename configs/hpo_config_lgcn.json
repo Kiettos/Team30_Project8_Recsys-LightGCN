@@ -1,0 +1,114 @@
+{
+  "_readme": [
+    "Each experiment overrides keys of 'base'.",
+    "Stage A: layers x dim. Stage B: LightGCN lr x reg.",
+    "After stage A, if the best LightGCN (layers, dim) differs from 2/64, edit stage B to use them.",
+    "If you change the settings of an experiment, change its name too (finished runs are skipped by name + settings).",
+    "HPO runs are selected on VALIDATION only. Test is touched only by --final."
+  ],
+  "base": {
+    "dim": 64,
+    "layers": 2,
+    "lr": 0.001,
+    "reg": 0.0001,
+    "batch": 2048,
+    "epochs": 300,
+    "patience": 10,
+    "min_delta": 0.0001,
+    "seed": 0
+  },
+  "final_seeds": [
+    0,
+    1,
+    2
+  ],
+  "experiments": [
+    {
+      "name": "A_lgcn_L1_d64",
+      "stage": "A",
+      "note": "layers sweep at dim 64",
+      "layers": 1,
+      "dim": 64
+    },
+    {
+      "name": "A_lgcn_L2_d64",
+      "stage": "A",
+      "note": "layers sweep at dim 64",
+      "layers": 2,
+      "dim": 64
+    },
+    {
+      "name": "A_lgcn_L3_d64",
+      "stage": "A",
+      "note": "layers sweep at dim 64",
+      "layers": 3,
+      "dim": 64
+    },
+    {
+      "name": "A_lgcn_L4_d64",
+      "stage": "A",
+      "note": "layers sweep at dim 64",
+      "layers": 4,
+      "dim": 64
+    },
+    {
+      "name": "A_lgcn_L2_d32",
+      "stage": "A",
+      "note": "embedding size sweep at 2 layers",
+      "layers": 2,
+      "dim": 32
+    },
+    {
+      "name": "A_lgcn_L2_d128",
+      "stage": "A",
+      "note": "embedding size sweep at 2 layers",
+      "layers": 2,
+      "dim": 128
+    },
+    {
+      "name": "B_lgcn_lr0.001_reg0.0003",
+      "stage": "B",
+      "note": "LightGCN lr x reg (lr 1e-3 / reg 1e-4 already in A_lgcn_L2_d64)",
+      "layers": 2,
+      "dim": 64,
+      "lr": 0.001,
+      "reg": 0.0003
+    },
+    {
+      "name": "B_lgcn_lr0.001_reg0.001",
+      "stage": "B",
+      "note": "LightGCN lr x reg (lr 1e-3 / reg 1e-4 already in A_lgcn_L2_d64)",
+      "layers": 2,
+      "dim": 64,
+      "lr": 0.001,
+      "reg": 0.001
+    },
+    {
+      "name": "B_lgcn_lr0.003_reg0.0001",
+      "stage": "B",
+      "note": "LightGCN lr x reg (lr 1e-3 / reg 1e-4 already in A_lgcn_L2_d64)",
+      "layers": 2,
+      "dim": 64,
+      "lr": 0.003,
+      "reg": 0.0001
+    },
+    {
+      "name": "B_lgcn_lr0.003_reg0.0003",
+      "stage": "B",
+      "note": "LightGCN lr x reg (lr 1e-3 / reg 1e-4 already in A_lgcn_L2_d64)",
+      "layers": 2,
+      "dim": 64,
+      "lr": 0.003,
+      "reg": 0.0003
+    },
+    {
+      "name": "B_lgcn_lr0.003_reg0.001",
+      "stage": "B",
+      "note": "LightGCN lr x reg (lr 1e-3 / reg 1e-4 already in A_lgcn_L2_d64)",
+      "layers": 2,
+      "dim": 64,
+      "lr": 0.003,
+      "reg": 0.001
+    }
+  ]
+}

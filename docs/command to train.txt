@@ -1,0 +1,10 @@
+# Kiểm tra kế hoạch từng file
+python hpo_lightgcn.py --config hpo_config_mf.json --list
+python hpo_lightgcn.py --config hpo_config_lgcn.json --list
+
+# Chạy HPO cho từng thuật toán
+python hpo_lightgcn.py --config hpo_config_mf.json
+python hpo_lightgcn.py --config hpo_config_lgcn.json
+
+# Sau khi cả 2 chạy xong, chạy đánh giá cuối cùng trên tập Test
+python hpo_lightgcn.py --config hpo_config_lgcn.json --final
