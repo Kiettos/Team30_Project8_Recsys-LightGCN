@@ -1,1 +1,15 @@
+--extra-index-url https://download.pytorch.org/whl/cu12
+
+numpy
+torch
+
 pandas
+streamlit 
+networkx 
+matplotlib
+tqdm
+scipy
+
+torch
+torchvision
+torchaudio
