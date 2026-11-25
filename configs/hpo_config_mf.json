@@ -1,0 +1,86 @@
+{
+  "_readme": [
+    "Cùng schema với hpo_config_lgcn.json để hai mô hình được so sánh công bằng.",
+    "Stage A: quét kích thước embedding (dim) - đúng yêu cầu đề tài.",
+    "Stage B: quét lr x reg tại dim tốt nhất của stage A (sửa tay nếu dim tốt nhất khác 64).",
+    "MF = LightGCN với 0 tầng, nên 'layers': 0 chỉ để ghi chú, không dùng trong code.",
+    "HPO chọn theo VALIDATION. Test chỉ dùng trong --final."
+  ],
+  "base": {
+    "dim": 64,
+    "layers": 0,
+    "lr": 0.001,
+    "reg": 0.0001,
+    "batch": 2048,
+    "epochs": 300,
+    "patience": 10,
+    "min_delta": 0.0001,
+    "seed": 0
+  },
+  "final_seeds": [
+    0,
+    1,
+    2
+  ],
+  "experiments": [
+    {
+      "name": "A_mf_d32",
+      "stage": "A",
+      "note": "embedding size sweep",
+      "dim": 32
+    },
+    {
+      "name": "A_mf_d64",
+      "stage": "A",
+      "note": "embedding size sweep",
+      "dim": 64
+    },
+    {
+      "name": "A_mf_d128",
+      "stage": "A",
+      "note": "embedding size sweep",
+      "dim": 128
+    },
+    {
+      "name": "A_mf_d256",
+      "stage": "A",
+      "note": "embedding size sweep",
+      "dim": 256
+    },
+    {
+      "name": "B_mf_lr0.001_reg0.0003",
+      "stage": "B",
+      "note": "lr x reg (lr 1e-3 / reg 1e-4 đã có trong A_mf_d64)",
+      "lr": 0.001,
+      "reg": 0.0003
+    },
+    {
+      "name": "B_mf_lr0.001_reg0.001",
+      "stage": "B",
+      "note": "lr x reg (lr 1e-3 / reg 1e-4 đã có trong A_mf_d64)",
+      "lr": 0.001,
+      "reg": 0.001
+    },
+    {
+      "name": "B_mf_lr0.003_reg0.0001",
+      "stage": "B",
+      "note": "lr x reg (lr 1e-3 / reg 1e-4 đã có trong A_mf_d64)",
+      "lr": 0.003,
+      "reg": 0.0001
+    },
+    {
+      "name": "B_mf_lr0.003_reg0.0003",
+      "stage": "B",
+      "note": "lr x reg (lr 1e-3 / reg 1e-4 đã có trong A_mf_d64)",
+      "lr": 0.003,
+      "reg": 0.0003
+    },
+    {
+      "name": "B_mf_lr0.003_reg0.001",
+      "stage": "B",
+      "note": "lr x reg (lr 1e-3 / reg 1e-4 đã có trong A_mf_d64)",
+      "lr": 0.003,
+      "reg": 0.001
+    }
+  ]
+}
