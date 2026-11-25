@@ -2,7 +2,9 @@
   "_readme": [
     "Cùng schema với hpo_config_lgcn.json để hai mô hình được so sánh công bằng.",
     "Stage A: quét kích thước embedding (dim) - đúng yêu cầu đề tài.",
-    "Stage B: quét lr x reg tại dim tốt nhất của stage A (sửa tay nếu dim tốt nhất khác 64).",
+    "Stage B: quét lr x reg tại dim 64 (dim mặc định của stage A).",
+    "Stage C: thêm sau khi xem kết quả A/B - kiểm tra lại dim lớn (128/256) với reg tốt nhất (1e-3)",
+    "         vì stage B chỉ quét lr x reg ở dim 64, chưa kiểm tra chéo dim x reg.",
     "MF = LightGCN với 0 tầng, nên 'layers': 0 chỉ để ghi chú, không dùng trong code.",
     "HPO chọn theo VALIDATION. Test chỉ dùng trong --final."
   ],
@@ -79,6 +81,30 @@
       "name": "B_mf_lr0.003_reg0.001",
       "stage": "B",
       "note": "lr x reg (lr 1e-3 / reg 1e-4 đã có trong A_mf_d64)",
+      "lr": 0.003,
+      "reg": 0.001
+    },
+    {
+      "name": "C_mf_d128_lr0.001_reg0.001",
+      "stage": "C",
+      "note": "dim x reg: dim 128 với reg 1e-3 (stage B chỉ quét reg ở dim 64)",
+      "dim": 128,
+      "lr": 0.001,
+      "reg": 0.001
+    },
+    {
+      "name": "C_mf_d256_lr0.001_reg0.001",
+      "stage": "C",
+      "note": "dim x reg: dim 256 với reg 1e-3 (stage B chỉ quét reg ở dim 64)",
+      "dim": 256,
+      "lr": 0.001,
+      "reg": 0.001
+    },
+    {
+      "name": "C_mf_d128_lr0.003_reg0.001",
+      "stage": "C",
+      "note": "dim x lr: dim 128 với lr 3e-3, reg 1e-3",
+      "dim": 128,
       "lr": 0.003,
       "reg": 0.001
     }
