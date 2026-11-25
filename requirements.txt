@@ -1,15 +1,18 @@
---extra-index-url https://download.pytorch.org/whl/cu12
-
-numpy
-torch
-
+# Thư viện Python của project (KHÔNG gồm PyTorch).
+#
+# PyTorch phải cài riêng vì bản GPU/CPU khác nhau:
+#   GPU (khuyến nghị, cần NVIDIA + driver):  xem scripts/setup_env.ps1
+#   CPU (chỉ để chạy thử, rất chậm):        powershell -ExecutionPolicy Bypass -File scripts/setup_env.ps1 -Cpu
+#
+# Cài nhanh:
+#   python -m venv venv
+#   venv\Scripts\python.exe -m pip install --upgrade pip
+#   venv\Scripts\python.exe -m pip install -r requirements.txt
+#   venv\Scripts\python.exe -m pip install torch==2.5.1+cu121 --index-url https://download.pytorch.org/whl/cu121
+numpy>=1.26,<3
 pandas
-streamlit 
-networkx 
+scipy
+streamlit
+networkx
 matplotlib
 tqdm
-scipy
-
-torch
-torchvision
-torchaudio
