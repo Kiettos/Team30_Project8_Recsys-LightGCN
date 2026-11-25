@@ -1,10 +1,92 @@
-# Kiểm tra kế hoạch từng file
-python hpo_lightgcn.py --config hpo_config_mf.json --list
-python hpo_lightgcn.py --config hpo_config_lgcn.json --list
+RUNBOOK - CÁC LỆNH CHẠY PROJECT (Team 30 - Project 8)
+=======================================================
+Tất cả lệnh chạy từ THƯ MỤC GỐC của project (nơi có README.md, requirements.txt).
+Python dùng trong venv của project: venv\Scripts\python.exe
 
-# Chạy HPO cho từng thuật toán
-python hpo_lightgcn.py --config hpo_config_mf.json
-python hpo_lightgcn.py --config hpo_config_lgcn.json
+Thứ tự đúng: (0) cài môi trường -> (1) tiền xử lý -> (2) kiểm tra nhanh
+             -> (3) HPO từng mô hình -> (4) final trên TEST -> (5) tổng hợp bảng.
 
-# Sau khi cả 2 chạy xong, chạy đánh giá cuối cùng trên tập Test
-python hpo_lightgcn.py --config hpo_config_lgcn.json --final
+
+0. CÀI MÔI TRƯỜNG (chỉ làm 1 lần)
+---------------------------------
+powershell -ExecutionPolicy Bypass -File scripts\setup_env.ps1        # PyTorch bản GPU (CUDA 12.1)
+powershell -ExecutionPolicy Bypass -File scripts\setup_env.ps1 -Cpu   # chỉ chạy thử, KHÔNG train thật
+
+Kiểm tra:
+venv\Scripts\python.exe -c "import torch; print(torch.__version__, torch.cuda.is_available())"
+  -> phải ra: 2.5.1+cu121 True
+
+
+1. TIỀN XỬ LÝ DỮ LIỆU
+---------------------
+venv\Scripts\python.exe src\data\preprocess_ml1m.py
+  mặc định: implicit (rating >= 4), k-core 5, split TEMPORAL, val/test = 10%/10%
+  -> ghi processed\mf\*.csv, processed\lightgcn\*, processed\side_info\*, stats.json
+
+Muốn kiểm tra dữ liệu vừa sinh:
+venv\Scripts\python.exe -c "import json;d=json.load(open('processed/stats.json'));print(d['split'], d['n_users'], d['n_items'], d['n_train'], d['n_val'], d['n_test'])"
+  -> phải thấy: temporal 6034 3125 459436 57470 57470
+
+CHỈ dùng split ngẫu nhiên để so sánh phụ (KHÔNG dùng cho kết quả cuối):
+venv\Scripts\python.exe src\data\preprocess_ml1m.py --split random
+  -> nhớ chạy lại lệnh mặc định (không có --split) trước khi lấy kết quả cuối.
+
+
+2. KIỂM TRA NHANH (không ghi kết quả, không đụng TEST)
+-----------------------------------------------------
+venv\Scripts\python.exe src\baseline_pop.py                 # mốc MostPop -> results\baseline_popularity.csv
+venv\Scripts\python.exe src\model\Train_mf.py --list        # xem 9 thí nghiệm MF + trạng thái
+venv\Scripts\python.exe src\model\Train_mf.py --only A_mf_d64 --epochs 1            # chạy thử 1 epoch
+venv\Scripts\python.exe src\model\Train_mf.py --only A_mf_d64 --epochs 1 --device cpu  # thử không cần GPU
+venv\Scripts\python.exe src\model\Train_lightgcn.py --only A_lgcn_L2_d64 --epochs 1    # chạy thử 1 epoch
+
+Quy ước: có --epochs nghĩa là CHẠY THỬ -> không ghi results\*.csv và không lưu checkpoint.
+
+
+3. HPO - CHỌN CẤU HÌNH THEO VALIDATION
+--------------------------------------
+venv\Scripts\python.exe src\model\Train_mf.py
+  -> results\hpo_mf.csv (9 thí nghiệm: quét dim 32/64/128/256, rồi lr x reg)
+
+venv\Scripts\python.exe src\model\Train_lightgcn.py
+  -> results\hpo_lightgcn.csv (11 thí nghiệm: quét layers 1-4, dim 32/64/128, lr x reg)
+
+Lưu ý:
+- Chạy lại thì các thí nghiệm ĐÃ CÓ trong CSV sẽ được bỏ qua (theo tên). Muốn chạy lại
+  từ đầu: xoá results\hpo_mf.csv (hoặc hpo_lightgcn.csv).
+- Đổi cấu hình của một thí nghiệm thì phải ĐỔI TÊN nó, nếu không sẽ bị bỏ qua.
+- Thời gian ước tính trên RTX 3050 6GB (đo thực tế: MF ~3-4 s/epoch, LightGCN ~8-9 s/epoch,
+  epoch 300 + early stopping patience 10):
+    MF        : ~15-20 phút/thí nghiệm  -> 9 thí nghiệm khoảng 2-3 giờ
+    LightGCN  : ~40-45 phút/thí nghiệm  -> 11 thí nghiệm khoảng 6-8 giờ
+  Nên chạy qua đêm, và có thể chạy MF trước rồi LightGCN sau.
+
+
+4. FINAL - CHẠY TEST MỘT LẦN VỚI 3 SEED
+---------------------------------------
+venv\Scripts\python.exe src\model\Train_mf.py --final         # -> results\final_mf.csv, checkpoints\mf_s*.pth
+venv\Scripts\python.exe src\model\Train_lightgcn.py --final   # -> results\final_lightgcn.csv, checkpoints\lightgcn_s*.pth
+
+Chỉ chạy sau khi HPO xong. Script tự chọn cấu hình có VAL NDCG@20 cao nhất,
+train lại với seed 0/1/2, rồi mới đánh giá trên TEST (che cả train và val).
+
+
+5. TỔNG HỢP BẢNG SO SÁNH
+------------------------
+venv\Scripts\python.exe src\summarize_results.py
+  -> in trạng thái từng mô hình, ghi results\comparison.md (dán vào báo cáo) và results\comparison.csv
+
+Tóm tắt file kết quả:
+  results\hpo_*.csv            từng thí nghiệm HPO, chọn theo VAL
+  results\final_*.csv          TEST Recall@20 / NDCG@20 cho 3 seed (mean ± std)
+  results\baseline_popularity.csv  mốc MostPop để đối chiếu
+  checkpoints\*.pth            model của lần chạy --final (dùng cho demo)
+
+
+GHI NHỚ
+-------
+- TEST chỉ được dùng ở bước 4. Mọi lựa chọn mô hình/siêu tham số đều dựa trên VALIDATION.
+- Không sửa tay file trong processed\ hay results\ (đều do script sinh ra).
+- Nếu báo "Không tìm thấy CUDA": cài lại theo mục 0 với bản GPU.
+- Nếu console không in được tiếng Việt: chạy trong Windows Terminal, hoặc
+  đặt PYTHONIOENCODING=utf-8.
