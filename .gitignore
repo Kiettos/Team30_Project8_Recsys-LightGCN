@@ -31,3 +31,5 @@ desktop.ini
 # --- Log tạm ---
 *.log
 *.tmp
+
+results/old_mf/
