@@ -1,0 +1,7 @@
+model,config,metric,mean,std,seeds,split
+MF,C_mf_d256_lr0.001_reg0.001,Recall@20,0.1194,0.0004,3,test
+MF,C_mf_d256_lr0.001_reg0.001,NDCG@20,0.0764,0.0006,3,test
+LightGCN,A_lgcn_L2_d128,Recall@20,0.1226,0.0018,3,test
+LightGCN,A_lgcn_L2_d128,NDCG@20,0.0781,0.0012,3,test
+MostPop,popularity,recall20,0.0914,,1,val
+MostPop,popularity,recall20,0.0778,,1,test
