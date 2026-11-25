@@ -1,2 +1,33 @@
+# ============================================================
+# .gitignore - Team 30 / Project 8 - RecSys LightGCN
+# Nguyên tắc: chỉ track mã nguồn, cấu hình và KẾT QUẢ (CSV/MD nhỏ).
+# Dữ liệu sinh tự động và checkpoint nhị phân thì không track.
+# ============================================================
+
+# --- Môi trường ảo ---
 venv/
 .venv/
+
+# --- Sinh tự động bởi src/data/preprocess_ml1m.py (chạy lại ~1 phút là có) ---
+processed/
+
+# --- Checkpoint: file nhị phân, đổi mỗi lần train lại ---
+checkpoints/*.pth
+checkpoints/*.pt
+
+# --- Python ---
+__pycache__/
+*.py[cod]
+*.egg-info/
+.ipynb_checkpoints/
+
+# --- IDE / OS ---
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# --- Log tạm ---
+*.log
+*.tmp
